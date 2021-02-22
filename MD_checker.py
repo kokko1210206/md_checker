@@ -8,18 +8,20 @@ Created on Fri Feb 19 01:00:29 2021
 import glob
 import platform
 import can
+import can.interfaces.slcan
 from serial.tools import list_ports
 import serial
 import time
 import ctypes
-
+import os
+import stat
+import struct
     
 class MD_check:
     finish = False
     
-    def __init__(self,portname,_bitrate):
-        self.canbus = can.interfaces.slcan.slcanBus(channel=portname,bitrate=_bitrate)
-        self.serialbus = serial.Serial(portname, _bitrate)
+    def setting(self):
+        self.canbus = can.interfaces.slcan.slcanBus(channel=self.serial_port,bitrate=1000*1000)
     
     def count_devices(self,devices):
         if len(devices) == 1:
@@ -48,34 +50,29 @@ class MD_check:
     def can_msg(self,aid,data):
         msg = can.Message(arbitration_id = aid\
                           ,dlc = len(data)\
+                          ,is_extended_id=False
                           ,data = bytearray(data))
         return msg
     
-    def can_ready(self):
-        self.search_device()
-        self.bus.send(b'\r');
-        time.sleep(0.01)
-        self.bus.send(b'C\r');
-        time.sleep(0.01)
-        self.bus.send(b'S8\r');
-        time.sleep(0.01)
-        self.bus.send(b'O/r')
-        time.sleep(0.01)
         
     def can_send(self,canid,data):
         canmsg = self.can_msg(canid,data)
-        self.bus.send(canmsg)
+        self.canbus.send(canmsg)
     
 if __name__ == '__main__':
     print('MD Checker β\n\n')
     canid = 0x4e8
-    MD_check.can_ready()
-    time.sleep(0.2)
-    MD_check.can_send(ctypes.c_uint16(canid),ctypes.c_uint(1))
-    time.sleep(0.2)
-    MD_check.can_send(ctypes.c_uint16(canid+1),ctypes.float32(1.0))
-    time.sleep(1.0)
-    MD_check.can_send(ctypes.c_uint16(canid+1),ctypes.float32(-1.0))
-    time.sleep(1.0)
-    MD_check.can_send(ctypes.c_uint16(canid),ctypes.c_uint(0))
+    checker = MD_check()
+    checker.search_device()
+    checker.setting()
+    time.sleep(1.2)
+    checker.can_send(canid,data=[0x01])
+    time.sleep(1.2)
+    data=[1.0]
+    checker.can_send(canid+1,data=struct.pack('>f', *data))
+    time.sleep(1.5)
+    data=[-1.0]
+    checker.can_send(canid+1,data=struct.pack('>f', *data))
+    time.sleep(1.5)
+    checker.can_send(canid,data=[0x00])
     
