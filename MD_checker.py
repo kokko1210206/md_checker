@@ -10,9 +10,7 @@ import platform
 import can
 import can.interfaces.slcan
 from serial.tools import list_ports
-import serial
 import time
-import ctypes
 import os
 import stat
 import struct
@@ -39,7 +37,7 @@ class MD_check:
         if OS == 'Linux':
             devices = glob.glob('/dev/ttyACM?')
             self.count_devices(devices)
-        elif OS == 'windows':
+        elif OS == 'Windows':
             _devices = list_ports.comports()
             devices = [info.device for info in _devices]
             self.count_devices(devices) 
