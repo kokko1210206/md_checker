@@ -77,7 +77,7 @@ class slcan_check:
         global value_entry
         self.search_device()
         text = ""
-        if (self._device_ok == False) and ():{}
+        if (self._device_ok == False):{}
         elif (int_bool.get() == True and float_bool.get() == True) or (int_bool.get() == False and float_bool.get() == False):
             text = "Please select one type."
             tkinter.messagebox.showinfo('info',text)
@@ -97,7 +97,7 @@ class slcan_check:
     
 if __name__ == '__main__':
     gui = tkinter.Tk()
-    gui.title(u"slcan Checker v1.0")
+    gui.title(u"slcan Checker v2.0")
     gui.geometry("300x75")
     checker = slcan_check()
     
