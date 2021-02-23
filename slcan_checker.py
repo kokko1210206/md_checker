@@ -14,6 +14,7 @@ from serial.tools import list_ports
 import struct
 import tkinter
 from tkinter import messagebox
+import numpy as np
     
 class slcan_check:
     
@@ -82,11 +83,11 @@ class slcan_check:
             text = "Please select one type."
             tkinter.messagebox.showinfo('info',text)
         elif int_bool.get() == True:
-            value = [value_entry.get()]
-            self.can_send(id_entry.get(),data=value)
+            value = [int(value_entry.get())]
+            self.can_send(int(id_entry.get(),0),data=value)
         elif float_bool.get() == True:
-            value = [value_entry.get()]
-            self.can_send(id_entry.get(),data=struct.pack('>f', *value))
+            value = np.array([value_entry.get()], dtype='f4')
+            self.can_send(int(id_entry.get(),0),data=struct.pack('>f', *value))
     
     def port_check(self,event):
         self.search_device()
